@@ -22,11 +22,11 @@
     "moduleResolution": "Bundler",
     "allowJs": true,
     "jsx": "react-jsx",
+    "ignoreDeprecations": "5.0",
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@repo/ui/*": ["../../packages/ui/src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
