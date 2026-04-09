@@ -1,8 +1,8 @@
-# Next.js Foundations - Vercel Daily Web
+# Vercel Daily Web
 
 Single-app Next.js repository focused on the Vercel Daily web project.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-foundations-starter)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FYOUR_USERNAME%2Fvercel-daily)
 
 ## Getting Started
 
@@ -27,7 +27,7 @@ pnpm lint
 ## Project Structure
 
 ```
-nextjs-foundations/
+vercel-daily/
 ├── apps/
 │   └── web/                    # Vercel Daily app (localhost:3000)
 ├── turbo.json                  # Turborepo configuration

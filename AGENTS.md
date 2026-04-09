@@ -1,19 +1,17 @@
-# Next.js Foundations Starter
+# Vercel Daily
 
-This is the starter repository for the Next.js Foundations certification course.
+This is the repository for the Vercel Daily project.
 
 ## Project Overview
 
-A Turborepo monorepo with two Next.js applications and shared packages:
+A Turborepo monorepo with one Next.js application:
 
 ```
-nextjs-foundations-starter/
+vercel-daily/
 ├── apps/
-│   ├── web/          # Marketing site (port 3000)
-│   └── blog/         # Content hub (port 3001)
-├── packages/
-│   ├── ui/           # Shared React components (@repo/ui)
-│   └── api/          # Mock data layer with Faker (@repo/api)
+│   └── web/          # Vercel Daily app (port 3000)
+├── vercel.json       # Vercel deployment configuration
+├── pnpm-workspace.yaml # Workspace package definitions
 ├── turbo.json        # Turborepo task configuration
 ├── biome.jsonc       # Linting and formatting (Biome + ultracite)
 └── package.json      # Root workspace configuration
@@ -42,8 +40,8 @@ pnpm add -g vercel
 vercel login
 
 # Clone and install
-git clone https://github.com/YOUR_USERNAME/nextjs-foundations
-cd nextjs-foundations
+git clone https://github.com/YOUR_USERNAME/vercel-daily
+cd vercel-daily
 pnpm install
 
 # Link to your Vercel project
@@ -56,14 +54,12 @@ vercel env pull
 ### Development
 
 ```bash
-# Start both apps in dev mode
+# Start the app in dev mode
 pnpm dev
 # web: http://localhost:3000
-# blog: http://localhost:3001
 
 # Start a specific app
 pnpm dev --filter @repo/web
-pnpm dev --filter @repo/blog
 ```
 
 ### Vercel CLI
@@ -85,7 +81,7 @@ vercel open
 ### Quality Checks
 
 ```bash
-# Type check all packages
+# Type check the app
 pnpm check-types
 
 # Lint with Biome
@@ -101,29 +97,20 @@ pnpm check
 ### Building
 
 ```bash
-# Build all packages
+# Build the app
 pnpm build
 
 # Build specific app
 pnpm build --filter @repo/web
 ```
 
-## Package Dependencies
+## App Dependencies
 
-### Using Shared Packages
-
-Import from `@repo/ui` for components:
+Use local imports for app code and server data helpers:
 
 ```tsx
-import { Button } from "@repo/ui/button";
-import { Card } from "@repo/ui/card";
-```
-
-Import from `@repo/api` for mock data:
-
-```tsx
-import { getPosts } from "@repo/api/posts";
-import { getGalleryItems } from "@repo/api/gallery";
+import { ArticlesSection } from "@/components/articles-section";
+import { getArticles } from "@/lib/server/vercel-daily-api";
 ```
 
 ### Adding Dependencies
@@ -131,9 +118,6 @@ import { getGalleryItems } from "@repo/api/gallery";
 ```bash
 # Add to specific app
 pnpm add <package> --filter @repo/web
-
-# Add to shared package
-pnpm add <package> --filter @repo/ui
 
 # Add dev dependency to root
 pnpm add -D <package> -w
@@ -151,8 +135,6 @@ This project uses strict TypeScript with Matt Pocock's recommended settings:
 Path aliases are configured:
 
 - `@/*` - Local app imports
-- `@repo/ui/*` - Shared UI components
-- `@repo/api/*` - Mock data functions
 
 ## Biome (Linting & Formatting)
 
@@ -188,11 +170,11 @@ All components in the App Router are Server Components by default:
 
 ```tsx
 // app/page.tsx - This is a Server Component
-import { getPosts } from "@repo/api/posts";
+import { getArticles } from "@/lib/server/vercel-daily-api";
 
 export default async function Page() {
-  const posts = await getPosts();
-  return <PostList posts={posts} />;
+  const articles = await getArticles();
+  return <ArticlesSection articles={articles} />;
 }
 ```
 
@@ -211,22 +193,12 @@ export function Counter() {
 }
 ```
 
-### Shared Components
+### App Components
 
-Components in `@repo/ui` can be used in both apps:
+Keep reusable UI in `apps/web/src/components` and import via local aliases:
 
 ```tsx
-// packages/ui/src/button.tsx
-export function Button({ children, ...props }) {
-  return (
-    <button className="..." {...props}>
-      {children}
-    </button>
-  );
-}
-
-// apps/web/app/page.tsx
-import { Button } from "@repo/ui/button";
+import { HeroSection } from "@/components/hero-section";
 ```
 
 ## Troubleshooting
@@ -241,7 +213,7 @@ lsof -ti:3000 | xargs kill -9
 PORT=3002 pnpm dev --filter @repo/web
 ```
 
-### Type Errors After Package Changes
+### Type Errors After Dependency Changes
 
 ```bash
 # Clear Turborepo cache and rebuild
@@ -254,14 +226,14 @@ pnpm build
 
 Disable ESLint/Prettier extensions and enable Biome extension in your editor.
 
-## Course Integration
+## Project Guidelines
 
-This starter is designed for the Next.js Foundations certification. As you progress through lessons:
+Use these guidelines while working in this repository:
 
-1. **Don't modify shared packages** unless instructed
-2. **Focus on `apps/web` and `apps/blog`** for exercises
-3. **Use `@repo/api` functions** for mock data
-4. **Follow the lesson structure** - each builds on previous work
+1. **Prioritize changes in `apps/web`** unless instructed otherwise
+2. **Focus on `apps/web`** for exercises
+3. **Use `apps/web/src/lib/server/vercel-daily-api.ts`** for server-side data access
+4. **Follow existing project patterns** - keep changes consistent across the app
 
 ## Resources
 
