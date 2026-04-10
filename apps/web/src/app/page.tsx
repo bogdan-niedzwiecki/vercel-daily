@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getIsSubscribedFromCookies } from "@/lib/server/vercel-daily-api";
 import { ArticlesSkeleton } from "../components/articles-skeleton";
 import { ArticlesSection } from "../components/articles-section";
 import { BreakingNewsBanner } from "../components/breaking-news-banner";
@@ -26,11 +25,9 @@ function BreakingNewsBannerSkeleton() {
 }
 
 export default async function Page() {
-  const isSubscribed = await getIsSubscribedFromCookies();
-
   return (
     <main className="flex-1 py-8">
-      <HeroSection initialSubscribed={isSubscribed} />
+      <HeroSection />
       <Suspense fallback={<BreakingNewsBannerSkeleton />}>
         <BreakingNewsBanner />
       </Suspense>

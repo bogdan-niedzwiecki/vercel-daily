@@ -1,47 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
 import type { ReactNode } from "react";
 import { SubscribeIcon } from "./subscribe-icon";
+import { useSubscription } from "./subscription-provider";
 
 type SubscribeButtonProps = {
   children?: ReactNode;
-  initialSubscribed?: boolean;
 };
 
-export function SubscribeButton({
-  children,
-  initialSubscribed = false,
-}: SubscribeButtonProps) {
-  const router = useRouter();
-  const [isSubscribed, setIsSubscribed] = useState(initialSubscribed);
-  const [isPending, startTransition] = useTransition();
+export function SubscribeButton({ children }: SubscribeButtonProps) {
+  const { isSubscribed, isSubmitting, toggleSubscription } = useSubscription();
 
-  useEffect(() => {
-    setIsSubscribed(initialSubscribed);
-  }, [initialSubscribed]);
-
-  function handleClick() {
-    startTransition(async () => {
-      const method = isSubscribed ? "DELETE" : "POST";
-
-      try {
-        const response = await fetch("/api/subscription", {
-          method,
-          credentials: "same-origin",
-        });
-
-        if (!response.ok) {
-          return;
-        }
-
-        setIsSubscribed((value) => !value);
-        router.refresh();
-      } catch {
-        return;
-      }
-    });
+  async function handleClick() {
+    await toggleSubscription();
   }
 
   const label = isSubscribed ? "Unsubscribe" : (children ?? "Subscribe");
@@ -50,7 +21,7 @@ export function SubscribeButton({
     <button
       type="button"
       aria-pressed={isSubscribed}
-      disabled={isPending}
+      disabled={isSubmitting}
       onClick={handleClick}
       className="pill-control inline-flex cursor-pointer items-center justify-center"
     >

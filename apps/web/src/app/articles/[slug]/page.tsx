@@ -92,7 +92,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 ? "Enjoying the story? Get new posts in your inbox."
                 : "Subscribe to unlock full article content and daily updates."}
             </p>
-            <SubscribeButton initialSubscribed={isSubscribed} />
+            <SubscribeButton />
           </div>
         </div>
       </article>
