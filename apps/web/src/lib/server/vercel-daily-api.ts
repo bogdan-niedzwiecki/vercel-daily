@@ -1,5 +1,8 @@
 import "server-only";
 
+import { cookies } from "next/headers";
+import { cache } from "react";
+
 const API_BASE_URL =
     process.env.VERCEL_DAILY_NEWS_API_BASE_URL;
 const BYPASS_TOKEN = process.env.VERCEL_DAILY_NEWS_BYPASS_TOKEN;
@@ -51,6 +54,16 @@ export type ArticleCategory = {
     articleCount: number;
 };
 
+export type SubscriptionStatus = "active" | "inactive";
+
+export type Subscription = {
+    token: string;
+    status: SubscriptionStatus;
+    subscribedAt?: string | null;
+    createdAt: string;
+    updatedAt: string;
+};
+
 type ArticlesQueryParams = {
     page?: number;
     category?: string;
@@ -62,6 +75,7 @@ type ArticlesQueryParams = {
 async function apiGet<TData>(
     path: string,
     next?: NextFetchRequestConfig,
+    init?: RequestInit,
 ): Promise<ApiEnvelope<TData> | null> {
 
     if (!BYPASS_TOKEN) {
@@ -70,8 +84,10 @@ async function apiGet<TData>(
 
     try {
         const response = await fetch(`${API_BASE_URL}${path}`, {
+            ...init,
             headers: {
                 "x-vercel-protection-bypass": BYPASS_TOKEN,
+                ...(init?.headers ?? {}),
             },
             next,
         });
@@ -144,3 +160,76 @@ export async function getCategories(): Promise<ArticleCategory[]> {
 
     return payload?.data ?? [];
 }
+
+export async function createSubscription() {
+    const payload = await apiGet<Subscription>(
+        "/subscription/create",
+        undefined,
+        {
+            method: "POST",
+            cache: "no-store",
+        },
+    );
+
+    return payload?.data ?? null;
+}
+
+export async function getSubscriptionStatus(token: string) {
+    const payload = await apiGet<Subscription>(
+        "/subscription",
+        undefined,
+        {
+            cache: "no-store",
+            headers: {
+                "x-subscription-token": token,
+            },
+        },
+    );
+
+    return payload?.data ?? null;
+}
+
+export async function activateSubscription(token: string) {
+    const payload = await apiGet<Subscription>(
+        "/subscription",
+        undefined,
+        {
+            method: "POST",
+            cache: "no-store",
+            headers: {
+                "x-subscription-token": token,
+            },
+        },
+    );
+
+    return payload?.data ?? null;
+}
+
+export async function deactivateSubscription(token: string) {
+    const payload = await apiGet<Subscription>(
+        "/subscription",
+        undefined,
+        {
+            method: "DELETE",
+            cache: "no-store",
+            headers: {
+                "x-subscription-token": token,
+            },
+        },
+    );
+
+    return payload?.data ?? null;
+}
+
+export const getIsSubscribedFromCookies = cache(async () => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("vercel-daily-subscription-token")?.value;
+
+    if (!token) {
+        return false;
+    }
+
+    const subscription = await getSubscriptionStatus(token);
+
+    return subscription?.status === "active";
+});

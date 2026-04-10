@@ -2,7 +2,10 @@ import { ArticleContent } from "@/components/article-content";
 import { SubscribeButton } from "@/components/subscribe-button";
 import { TrendingArticlesSection } from "@/components/trending-articles-section";
 import { formatPublishedDate } from "@/lib/format-published-date";
-import { getArticleBySlug } from "@/lib/server/vercel-daily-api";
+import {
+  getArticleBySlug,
+  getIsSubscribedFromCookies,
+} from "@/lib/server/vercel-daily-api";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -37,8 +40,10 @@ export async function generateMetadata({
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-  const isSubscribed = false; // Replace with actual subscription logic
+  const [article, isSubscribed] = await Promise.all([
+    getArticleBySlug(slug),
+    getIsSubscribedFromCookies(),
+  ]);
 
   if (!article) {
     notFound();
@@ -87,7 +92,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 ? "Enjoying the story? Get new posts in your inbox."
                 : "Subscribe to unlock full article content and daily updates."}
             </p>
-            <SubscribeButton>Subscribe</SubscribeButton>
+            <SubscribeButton initialSubscribed={isSubscribed} />
           </div>
         </div>
       </article>

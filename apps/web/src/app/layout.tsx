@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getIsSubscribedFromCookies } from "@/lib/server/vercel-daily-api";
 import { NavPillLink } from "../components/nav-pill-link";
 import { SubscribeButton } from "../components/subscribe-button";
 import { SubscribeIcon } from "../components/subscribe-icon";
@@ -28,12 +29,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const year = new Date().getFullYear();
+  const isSubscribed = await getIsSubscribedFromCookies();
 
   return (
     <html lang="en">
@@ -60,7 +62,7 @@ export default function RootLayout({
                   <NavPillLink href="/search">Search</NavPillLink>
                 </nav>
               </div>
-              <SubscribeButton icon={<SubscribeIcon />} />
+              <SubscribeButton initialSubscribed={isSubscribed} />
             </div>
           </header>
           {children}

@@ -2,7 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { SubscribeButton } from "./subscribe-button";
 
-export function HeroSection() {
+type HeroSectionProps = {
+  initialSubscribed?: boolean;
+};
+
+export function HeroSection({ initialSubscribed = false }: HeroSectionProps) {
   return (
     <section className="relative isolate overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-rose-50 via-amber-50 to-sky-100 px-6 py-10 shadow-[0_14px_30px_-22px_rgba(0,0,0,0.45)] sm:px-10 lg:px-12 lg:py-14">
       <div className="absolute -left-16 top-0 h-56 w-56 rounded-full bg-rose-300/30 blur-3xl" />
@@ -57,7 +61,7 @@ export function HeroSection() {
         >
           Browse articles
         </Link>
-        <SubscribeButton>Subscribe</SubscribeButton>
+        <SubscribeButton initialSubscribed={initialSubscribed} />
       </div>
     </section>
   );
